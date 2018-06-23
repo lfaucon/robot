@@ -1,19 +1,55 @@
 import React, { Component } from "react";
 import "./App.css";
+import Game from "./Game";
+
+import { withStyles } from "@material-ui/core/styles";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+
+const drawerWidth = 240;
+
+const styles = theme => ({
+  root: {
+    height: "100%",
+    width: "100%",
+    zIndex: 1,
+    display: "flex"
+  },
+  appBar: {
+    position: "absolute",
+    width: "100%"
+  },
+  drawer: {
+    width: drawerWidth,
+    marginTop: "64px"
+  },
+  content: {
+    marginTop: "64px",
+    marginLeft: drawerWidth,
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing.unit * 3
+  }
+});
 
 class App extends Component {
   render() {
+    const { classes } = this.props;
     return (
-      <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">Welcome to Robot</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+      <div className={classes.root}>
+        <AppBar className={classes.appBar}>
+          <Toolbar>
+            <Typography variant="title" color="inherit" noWrap>
+              Welcome to Robot
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Game classes={classes} />
       </div>
     );
   }
 }
 
-export default App;
+export default withStyles(styles, { withTheme: true })(App);
