@@ -4,7 +4,6 @@ import { compose, withState } from "recompose";
 
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
-import Hidden from "@material-ui/core/Hidden";
 import Divider from "@material-ui/core/Divider";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
@@ -30,7 +29,17 @@ const LI = ({ Icon, text, onClick }) => (
   </ListItem>
 );
 
-const SidePanel = ({ classes, openRules, openSettings, openGithub }) => (
+const SidePanel = ({
+  classes,
+  openRules,
+  openSettings,
+  openGithub,
+  shuffleRobots,
+  shuffleBlocks,
+  shuffleTarget,
+  newGame,
+  restartGame
+}) => (
   <Drawer variant="permanent" anchor="left" classes={{ paper: classes.drawer }}>
     <List component="div">
       <LI
@@ -39,10 +48,11 @@ const SidePanel = ({ classes, openRules, openSettings, openGithub }) => (
         onClick={() => openRules(true)}
       />
       <Divider />
-      <LI Icon={Replay} text="New Game" />
-      <LI Icon={Shuffle} text="Shuffle Robots" />
-      <LI Icon={Shuffle} text="Shuffle Blocks" />
-      <LI Icon={Shuffle} text="Shuffle Target" />
+      <LI Icon={Replay} text="Restart Puzzle" onClick={restartGame} />
+      <LI Icon={Replay} text="New Puzzle" onClick={newGame} />
+      <LI Icon={Shuffle} text="Shuffle Robots" onClick={shuffleRobots} />
+      <LI Icon={Shuffle} text="Shuffle Blocks" onClick={shuffleBlocks} />
+      <LI Icon={Shuffle} text="Shuffle Target" onClick={shuffleTarget} />
       <LI
         Icon={Settings}
         text="Game settings"

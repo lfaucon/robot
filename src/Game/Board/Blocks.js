@@ -1,10 +1,10 @@
 import * as React from "react";
 
-const Walls = ({ walls }) => (
+const Blocks = ({ blocks }) => (
   <g>
-    {walls.map(({ x, y }) => (
+    {blocks.map(({ x, y }) => (
       <rect
-        key={"wall(" + x + "," + y + ")"}
+        key={"block(" + x + "," + y + ")"}
         width="42"
         height="42"
         x={50 * x + 4}
@@ -15,4 +15,4 @@ const Walls = ({ walls }) => (
   </g>
 );
 
-export default Walls;
+export default Blocks;
