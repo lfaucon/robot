@@ -29,7 +29,7 @@ const styles = theme => ({
     marginLeft: drawerWidth,
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
-    padding: theme.spacing.unit * 3
+    paddingLeft: theme.spacing.unit * 3
   }
 });
 

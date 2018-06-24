@@ -1,35 +1,23 @@
 import * as React from "react";
 import Mousetrap from "mousetrap";
 import { cloneDeep } from "lodash";
+import seedrandom from "seedrandom";
 
 import Board from "./Board";
 import Controls from "./Controls";
 import WinDialog from "./WinDialog";
 
+const colors = ["red", "blue", "green", "orange"];
 class Game extends React.Component {
+  rng = seedrandom();
+
   state = {
-    robots: {
-      red: {
-        x: 0,
-        y: 0,
-        fill: "red"
-      },
-      green: {
-        x: 11,
-        y: 0,
-        fill: "green"
-      },
-      blue: {
-        x: 0,
-        y: 11,
-        fill: "blue"
-      },
-      orange: {
-        x: 11,
-        y: 11,
-        fill: "orange"
-      }
+    gameId: null,
+    config: {
+      robots: 4,
+      blocks: 12
     },
+    robots: {},
     blocks: [],
     selected: "red",
     target: {
@@ -46,10 +34,10 @@ class Game extends React.Component {
 
   getFreeCoordinates = () => {
     while (true) {
-      const _x = Math.floor(Math.random() * 12);
-      const _y = Math.floor(Math.random() * 12);
-      const { robots, blocks } = this.state;
-      const blockers = Object.values(robots).concat(blocks);
+      const _x = Math.floor(12 * this.rng());
+      const _y = Math.floor(12 * this.rng());
+      const { robots, blocks, target } = this.state;
+      const blockers = [...Object.values(robots), ...blocks, target];
       if (!blockers.find(({ x, y }) => x === _x && y === _y)) {
         return [_x, _y];
       }
@@ -57,19 +45,21 @@ class Game extends React.Component {
   };
 
   shuffleRobots = () => {
-    const { robots } = this.state;
-    Object.values(robots).forEach(R => {
+    const { config } = this.state;
+    this.state.robots = {};
+    new Array(config.robots).fill().forEach((_, i) => {
       const [x, y] = this.getFreeCoordinates();
-      R.x = x;
-      R.y = y;
+      const fill = colors[i];
+      this.state.robots[fill] = { x, y, fill };
     });
     this.forceUpdate();
     this.saveState();
   };
 
   shuffleBlocks = () => {
+    const { config } = this.state;
     this.state.blocks = [];
-    const blocks = new Array(12).fill().forEach(_ => {
+    const blocks = new Array(config.blocks).fill().forEach(_ => {
       const [x, y] = this.getFreeCoordinates();
       this.state.blocks.push({ x, y });
     });
@@ -78,21 +68,26 @@ class Game extends React.Component {
   };
 
   shuffleTarget = () => {
+    this.state.target = { x: -1, y: -1 };
     const [x, y] = this.getFreeCoordinates();
-    const stroke = ["red", "blue", "green", "orange"][
-      Math.floor(Math.random() * 4)
-    ];
+    const stroke = colors[Math.floor(4 * this.rng())];
     this.state.target = { x, y, stroke };
+    this.state.selected = stroke;
     this.forceUpdate();
     this.saveState();
   };
 
-  newGame = () => {
+  newGame = seed => {
+    const randSeed = Math.floor(Math.random() * 0x1000000).toString(16);
+    const gameId = seed ? seed : randSeed;
+    this.rng = seedrandom(gameId);
+    this.state.robots = {};
+    this.state.blocks = [];
+    this.state.target = { x: -1, y: -1 };
     this.shuffleBlocks();
     this.shuffleRobots();
     this.shuffleTarget();
-    this.saveState();
-    this.setState({ winning: false });
+    this.setState({ winning: false, gameId });
   };
 
   restartGame = () => {
@@ -103,7 +98,7 @@ class Game extends React.Component {
   move = direction => {
     const { robots, selected, blocks, target } = this.state;
     const R = robots[selected];
-    const blockers = Object.values(robots).concat(blocks);
+    const blockers = [...Object.values(robots), ...blocks];
 
     const maxFn = b => Math.max(-1, ...b) + 1;
     const minFn = b => Math.min(12, ...b) - 1;
@@ -122,7 +117,7 @@ class Game extends React.Component {
   };
 
   componentDidMount() {
-    this.saveState();
+    this.newGame();
 
     Mousetrap.bind("right", () => this.move("right"));
     Mousetrap.bind("left", () => this.move("left"));
@@ -144,10 +139,7 @@ class Game extends React.Component {
     const { classes } = this.props;
     const controls = {
       restartGame: this.restartGame,
-      newGame: this.newGame,
-      shuffleBlocks: this.shuffleBlocks,
-      shuffleRobots: this.shuffleRobots,
-      shuffleTarget: this.shuffleTarget
+      newGame: this.newGame
     };
     return (
       <React.Fragment>

@@ -11,7 +11,6 @@ import ListItemText from "@material-ui/core/ListItemText";
 
 import Assignment from "@material-ui/icons/Assignment";
 import Replay from "@material-ui/icons/Replay";
-import Shuffle from "@material-ui/icons/Shuffle";
 import Settings from "@material-ui/icons/Settings";
 import BugReport from "@material-ui/icons/BugReport";
 import Build from "@material-ui/icons/Build";
@@ -19,6 +18,7 @@ import Build from "@material-ui/icons/Build";
 import RulesDialog from "./RulesDialog";
 import SettingsDialog from "./SettingsDialog";
 import GithubDialog from "./GithubDialog";
+import LoadDialog from "./LoadDialog";
 
 const LI = ({ Icon, text, onClick }) => (
   <ListItem button onClick={onClick}>
@@ -34,9 +34,7 @@ const SidePanel = ({
   openRules,
   openSettings,
   openGithub,
-  shuffleRobots,
-  shuffleBlocks,
-  shuffleTarget,
+  openLoad,
   newGame,
   restartGame
 }) => (
@@ -48,11 +46,9 @@ const SidePanel = ({
         onClick={() => openRules(true)}
       />
       <Divider />
-      <LI Icon={Replay} text="Restart Puzzle" onClick={restartGame} />
-      <LI Icon={Replay} text="New Puzzle" onClick={newGame} />
-      <LI Icon={Shuffle} text="Shuffle Robots" onClick={shuffleRobots} />
-      <LI Icon={Shuffle} text="Shuffle Blocks" onClick={shuffleBlocks} />
-      <LI Icon={Shuffle} text="Shuffle Target" onClick={shuffleTarget} />
+      <LI Icon={Replay} text="Restart Puzzle" onClick={() => restartGame()} />
+      <LI Icon={Replay} text="New Puzzle" onClick={() => newGame()} />
+      <LI Icon={Replay} text="Load Game" onClick={() => openLoad(true)} />
       <LI
         Icon={Settings}
         text="Game settings"
@@ -78,11 +74,17 @@ const Controls = props => (
       onClose={() => props.openSettings(false)}
     />
     <GithubDialog open={props.github} onClose={() => props.openGithub(false)} />
+    <LoadDialog
+      open={props.load}
+      onClose={() => props.openLoad(false)}
+      newGame={props.newGame}
+    />
   </React.Fragment>
 );
 
 export default compose(
   withState("rules", "openRules", false),
   withState("settings", "openSettings", false),
-  withState("github", "openGithub", false)
+  withState("github", "openGithub", false),
+  withState("load", "openLoad", false)
 )(Controls);

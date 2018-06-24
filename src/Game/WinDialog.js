@@ -21,10 +21,10 @@ const WinDialog = ({ open, onClose, newGame, restartGame }) => (
       </DialogContentText>
     </DialogContent>
     <DialogActions>
-      <Button onClick={restartGame} color="primary">
+      <Button onClick={() => restartGame()} color="primary">
         Try Again
       </Button>
-      <Button onClick={newGame} color="primary">
+      <Button onClick={() => newGame()} color="primary">
         New Puzzle
       </Button>
     </DialogActions>

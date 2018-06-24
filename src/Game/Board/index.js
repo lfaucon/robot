@@ -11,14 +11,14 @@ const style = {
   strokeWidth: "4px"
 };
 
-const Board = ({ robots, blocks, target, selected, classes }) => (
+const Board = ({ robots, blocks, target, selected, classes, gameId }) => (
   <div className={classes.content}>
+    <p>Game ID: {gameId}</p>
     <svg width="600" height="600">
       <rect width="600" height="600" style={style} />
-      <Robot {...robots.red} selected={selected === "red"} />
-      <Robot {...robots.green} selected={selected === "green"} />
-      <Robot {...robots.blue} selected={selected === "blue"} />
-      <Robot {...robots.orange} selected={selected === "orange"} />
+      {Object.values(robots).map(R => (
+        <Robot {...R} selected={selected === R.fill} key={R.fill} />
+      ))}
       <Grid />
       <Blocks blocks={blocks} />
       <Target {...target} />
