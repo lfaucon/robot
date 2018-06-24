@@ -23,6 +23,16 @@ const SettingsDialog = ({ id, setId, newGame, open, onClose }) => (
         label="Game ID"
         fullWidth
         onChange={e => setId(e.target.value)}
+        onSubmit={() => {
+          newGame(id);
+          onClose();
+        }}
+        onKeyPress={e => {
+          if (e.key === "Enter") {
+            newGame(id);
+            onClose();
+          }
+        }}
       />
     </DialogContent>
     <DialogActions>
