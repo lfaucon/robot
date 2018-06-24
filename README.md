@@ -1,0 +1,1 @@
+A game inspired from [Ricochet Robots](https://en.wikipedia.org/wiki/Ricochet_Robot). Play it at https://lfaucon.github.io/robot/
