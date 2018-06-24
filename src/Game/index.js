@@ -46,35 +46,26 @@ class Game extends React.Component {
 
   shuffleRobots = () => {
     const { config } = this.state;
-    this.state.robots = {};
     new Array(config.robots).fill().forEach((_, i) => {
       const [x, y] = this.getFreeCoordinates();
       const fill = colors[i];
       this.state.robots[fill] = { x, y, fill };
     });
-    this.forceUpdate();
-    this.saveState();
   };
 
   shuffleBlocks = () => {
     const { config } = this.state;
-    this.state.blocks = [];
     const blocks = new Array(config.blocks).fill().forEach(_ => {
       const [x, y] = this.getFreeCoordinates();
       this.state.blocks.push({ x, y });
     });
-    this.forceUpdate();
-    this.saveState();
   };
 
   shuffleTarget = () => {
-    this.state.target = { x: -1, y: -1 };
     const [x, y] = this.getFreeCoordinates();
     const stroke = colors[Math.floor(4 * this.rng())];
     this.state.target = { x, y, stroke };
     this.state.selected = stroke;
-    this.forceUpdate();
-    this.saveState();
   };
 
   newGame = seed => {
@@ -87,7 +78,10 @@ class Game extends React.Component {
     this.shuffleBlocks();
     this.shuffleRobots();
     this.shuffleTarget();
-    this.setState({ winning: false, gameId });
+    this.state.winning = false;
+    this.state.gameId = gameId;
+    this.forceUpdate();
+    this.saveState();
   };
 
   restartGame = () => {
