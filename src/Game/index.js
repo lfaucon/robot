@@ -104,30 +104,17 @@ class Game extends React.Component {
     const { robots, selected, blocks, target } = this.state;
     const R = robots[selected];
     const blockers = Object.values(robots).concat(blocks);
-    if (direction === "up") {
-      const block = blockers
-        .filter(({ x, y }) => x === R.x && y < R.y)
-        .map(item => item.y);
-      R.y = block.length > 0 ? Math.max(...block) + 1 : 0;
-    }
-    if (direction === "down") {
-      const block = blockers
-        .filter(({ x, y }) => x === R.x && y > R.y)
-        .map(item => item.y);
-      R.y = block.length > 0 ? Math.min(...block) - 1 : 11;
-    }
-    if (direction === "left") {
-      const block = blockers
-        .filter(({ x, y }) => x < R.x && y === R.y)
-        .map(item => item.x);
-      R.x = block.length > 0 ? Math.max(...block) + 1 : 0;
-    }
-    if (direction === "right") {
-      const block = blockers
-        .filter(({ x, y }) => x > R.x && y === R.y)
-        .map(item => item.x);
-      R.x = block.length > 0 ? Math.min(...block) - 1 : 11;
-    }
+
+    const maxFn = b => Math.max(-1, ...b) + 1;
+    const minFn = b => Math.min(12, ...b) - 1;
+    const [filterFn, xy, minmaxFn] = {
+      up: [({ x, y }) => x === R.x && y < R.y, "y", maxFn],
+      down: [({ x, y }) => x === R.x && y > R.y, "y", minFn],
+      left: [({ x, y }) => x < R.x && y === R.y, "x", maxFn],
+      right: [({ x, y }) => x > R.x && y === R.y, "x", minFn]
+    }[direction];
+    R[xy] = minmaxFn(blockers.filter(filterFn).map(i => i[xy]));
+
     if (R.fill === target.stroke && R.x === target.x && R.y === target.y) {
       this.state.winning = true;
     }
