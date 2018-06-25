@@ -3,8 +3,11 @@ import Mousetrap from "mousetrap";
 import { cloneDeep } from "lodash";
 import seedrandom from "seedrandom";
 
+import Grid from "@material-ui/core/Grid";
+
 import Board from "./Board";
-import Controls from "./Controls";
+import SidePanel from "./SidePanel";
+import Info from "./Info";
 import WinDialog from "./WinDialog";
 
 const colors = ["red", "blue", "green", "orange"];
@@ -13,11 +16,12 @@ class Game extends React.Component {
 
   state = {
     gameId: null,
+    moves: 0,
     config: {
       robots: 4,
       blocks: 12
     },
-    robots: {},
+    robots: [],
     blocks: [],
     selected: "red",
     target: {
@@ -37,7 +41,7 @@ class Game extends React.Component {
       const _x = Math.floor(12 * this.rng());
       const _y = Math.floor(12 * this.rng());
       const { robots, blocks, target } = this.state;
-      const blockers = [...Object.values(robots), ...blocks, target];
+      const blockers = [...robots, ...blocks, target];
       if (!blockers.find(({ x, y }) => x === _x && y === _y)) {
         return [_x, _y];
       }
@@ -49,13 +53,13 @@ class Game extends React.Component {
     new Array(config.robots).fill().forEach((_, i) => {
       const [x, y] = this.getFreeCoordinates();
       const fill = colors[i];
-      this.state.robots[fill] = { x, y, fill };
+      this.state.robots.push({ x, y, fill });
     });
   };
 
   shuffleBlocks = () => {
     const { config } = this.state;
-    const blocks = new Array(config.blocks).fill().forEach(_ => {
+    new Array(config.blocks).fill().forEach(_ => {
       const [x, y] = this.getFreeCoordinates();
       this.state.blocks.push({ x, y });
     });
@@ -72,13 +76,14 @@ class Game extends React.Component {
     const randSeed = Math.floor(Math.random() * 0x1000000).toString(16);
     const gameId = seed ? seed : randSeed;
     this.rng = seedrandom(gameId);
-    this.state.robots = {};
+    this.state.robots = [];
     this.state.blocks = [];
     this.state.target = { x: -1, y: -1 };
     this.shuffleBlocks();
     this.shuffleRobots();
     this.shuffleTarget();
     this.state.winning = false;
+    this.state.moves = 0;
     this.state.gameId = gameId;
     this.forceUpdate();
     this.saveState();
@@ -86,13 +91,15 @@ class Game extends React.Component {
 
   restartGame = () => {
     this.setState(cloneDeep(this.saved));
-    this.setState({ winning: false });
+    this.setState({ winning: false, moves: 0 });
   };
 
   move = direction => {
+    this.state.moves += 1;
+
     const { robots, selected, blocks, target } = this.state;
-    const R = robots[selected];
-    const blockers = [...Object.values(robots), ...blocks];
+    const R = robots.find(r => r.fill === selected);
+    const blockers = [...robots, ...blocks];
 
     const maxFn = b => Math.max(-1, ...b) + 1;
     const minFn = b => Math.min(12, ...b) - 1;
@@ -129,22 +136,29 @@ class Game extends React.Component {
   }
 
   render() {
-    const { winning } = this.state;
-    const { classes } = this.props;
+    const { winning, moves } = this.state;
     const controls = {
       restartGame: this.restartGame,
-      newGame: this.newGame
+      newGame: this.newGame,
+      selectRobot: color => this.setState({ selected: color }),
+      move: this.move
     };
     return (
-      <React.Fragment>
-        <Controls classes={classes} {...controls} />
-        <Board {...this.state} classes={classes} />
+      <Grid container spacing={8}>
+        <Grid item xs={12} sm={4} md={3}>
+          <SidePanel {...controls} />
+        </Grid>
+        <Grid item xs={12} sm={7} md={6}>
+          <Info {...this.state} />
+          <Board {...this.state} {...controls} />
+        </Grid>
         <WinDialog
           open={winning}
-          {...controls}
+          moves={moves}
           onClose={() => this.setState({ winning: false })}
+          {...controls}
         />
-      </React.Fragment>
+      </Grid>
     );
   }
 }

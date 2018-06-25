@@ -1,9 +1,10 @@
 import * as React from "react";
 
 import Robot from "./Robot";
-import Grid from "./Grid";
+import SquareGrid from "./SquareGrid";
 import Blocks from "./Blocks";
 import Target from "./Target";
+import Controls from "./Controls";
 
 const style = {
   fill: "#eee",
@@ -11,19 +12,28 @@ const style = {
   strokeWidth: "4px"
 };
 
-const Board = ({ robots, blocks, target, selected, classes, gameId }) => (
-  <div className={classes.content}>
-    <p>Game ID: {gameId}</p>
-    <svg width="600" height="600">
-      <rect width="600" height="600" style={style} />
-      {Object.values(robots).map(R => (
-        <Robot {...R} selected={selected === R.fill} key={R.fill} />
-      ))}
-      <Grid />
-      <Blocks blocks={blocks} />
-      <Target {...target} />
-    </svg>
-  </div>
-);
+const Board = props => {
+  const { robots, blocks, target, selected } = props;
+  const { move, selectRobot } = props;
+  return (
+    <div>
+      <svg viewBox="0 0 600 600" width="100%">
+        <rect width="600" height="600" style={style} />
+        {robots.map(R => (
+          <Robot
+            {...R}
+            selected={selected === R.fill}
+            key={R.fill}
+            selectRobot={() => selectRobot(R.fill)}
+          />
+        ))}
+        <SquareGrid />
+        <Blocks blocks={blocks} />
+        <Target {...target} />
+      </svg>
+      <Controls move={move} selectRobot={selectRobot} />
+    </div>
+  );
+};
 
 export default Board;

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-const Robot = ({ fill, x, y, selected }) => (
+const Robot = ({ fill, x, y, selected, selectRobot }) => (
   <g>
     <rect
       width="42"
@@ -8,6 +8,7 @@ const Robot = ({ fill, x, y, selected }) => (
       x={50 * x + 4}
       y={50 * y + 4}
       style={{ fill }}
+      onClick={selectRobot}
     />
     {selected && (
       <rect

@@ -17,8 +17,9 @@ const GithubDialog = ({ open, onClose }) => (
     <DialogTitle id="alert-dialog-title">Hello there</DialogTitle>
     <DialogContent>
       <DialogContentText id="alert-dialog-description">
-        To report bugs or contribute to this project, please contact me by email
-        at lpfaucon@gmail.com
+        To report bugs or contribute to this project, please submit issues or
+        pull request to my{" "}
+        <a href="https://github.com/lfaucon/robot">Github repository</a>
       </DialogContentText>
     </DialogContent>
     <DialogActions>

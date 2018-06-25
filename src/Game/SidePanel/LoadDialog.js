@@ -22,6 +22,7 @@ const SettingsDialog = ({ id, setId, newGame, open, onClose }) => (
         margin="dense"
         label="Game ID"
         fullWidth
+        value={id}
         onChange={e => setId(e.target.value)}
         onSubmit={() => {
           newGame(id);

@@ -7,7 +7,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
-const WinDialog = ({ open, onClose, newGame, restartGame }) => (
+const WinDialog = ({ open, onClose, moves, newGame, restartGame }) => (
   <Dialog
     open={open}
     onClose={onClose}
@@ -17,7 +17,8 @@ const WinDialog = ({ open, onClose, newGame, restartGame }) => (
     <DialogTitle id="alert-dialog-title">Congratulation</DialogTitle>
     <DialogContent>
       <DialogContentText id="alert-dialog-description">
-        You solved the puzzle. Did you use the minimum number of moves?
+        You solved the puzzle with <b>{moves} moves</b>. Can you do it with
+        less?
       </DialogContentText>
     </DialogContent>
     <DialogActions>
