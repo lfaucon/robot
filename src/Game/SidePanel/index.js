@@ -3,6 +3,8 @@ import * as React from "react";
 import { compose, withState } from "recompose";
 
 import Hidden from "@material-ui/core/Hidden";
+import IconButton from "@material-ui/core/IconButton";
+import Paper from "@material-ui/core/Paper";
 import Collapse from "@material-ui/core/Collapse";
 import List from "@material-ui/core/List";
 import Divider from "@material-ui/core/Divider";
@@ -34,7 +36,6 @@ const LI = ({ Icon, text, onClick }) => (
 );
 
 const SidePanel = ({
-  classes,
   openRules,
   openSettings,
   openGithub,
@@ -59,13 +60,33 @@ const SidePanel = ({
   </List>
 );
 
+const MobilePanel = props => (
+  <Paper>
+    <IconButton onClick={() => props.setOpen(!props.open)}>
+      <Menu />
+    </IconButton>
+    <IconButton onClick={() => props.openRules(true)}>
+      <Assignment />
+    </IconButton>
+    <IconButton onClick={() => props.restartGame()}>
+      <Replay />
+    </IconButton>
+    <IconButton onClick={() => props.newGame()}>
+      <Casino />
+    </IconButton>
+    <IconButton onClick={() => props.openLoad(true)}>
+      <Code />
+    </IconButton>
+  </Paper>
+);
+
 const ReactiveSidePanel = withState("open", "setOpen", false)(props => (
   <React.Fragment>
     <Hidden xsDown>
       <SidePanel {...props} />
     </Hidden>
     <Hidden smUp>
-      <LI Icon={Menu} text="Menu" onClick={() => props.setOpen(!props.open)} />
+      <MobilePanel {...props} />
       <Collapse in={props.open}>
         <SidePanel {...props} />
       </Collapse>

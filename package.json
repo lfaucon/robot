@@ -6,6 +6,7 @@
   "dependencies": {
     "@material-ui/core": "^1.2.3",
     "@material-ui/icons": "^1.1.0",
+    "hammerjs": "^2.0.8",
     "lodash": "^4.17.10",
     "mousetrap": "^1.6.2",
     "random-seed": "^0.3.0",

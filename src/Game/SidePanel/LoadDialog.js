@@ -50,4 +50,4 @@ const SettingsDialog = ({ id, setId, newGame, open, onClose }) => (
   </Dialog>
 );
 
-export default withState("id", "setId", undefined)(SettingsDialog);
+export default withState("id", "setId", "")(SettingsDialog);
