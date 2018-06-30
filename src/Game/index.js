@@ -24,11 +24,7 @@ class Game extends React.Component {
     robots: [],
     blocks: [],
     selected: "red",
-    target: {
-      x: 6,
-      y: 6,
-      stroke: "red"
-    },
+    target: {},
     winning: false
   };
 
@@ -54,14 +50,6 @@ class Game extends React.Component {
       const [x, y] = this.getFreeCoordinates();
       const fill = colors[i];
       this.state.robots.push({ x, y, fill });
-    });
-  };
-
-  shuffleBlocks = () => {
-    const { config } = this.state;
-    new Array(config.blocks).fill().forEach(_ => {
-      const [x, y] = this.getFreeCoordinates();
-      this.state.blocks.push({ x, y });
     });
   };
 
