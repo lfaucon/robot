@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { compose, withState } from "recompose";
 
 import Hidden from "@material-ui/core/Hidden";
@@ -99,7 +98,10 @@ const Dialogs = props => (
     <RulesDialog open={props.rules} onClose={() => props.openRules(false)} />
     <SettingsDialog
       open={props.settings}
+      config={props.config}
+      setConfig={props.setConfig}
       onClose={() => props.openSettings(false)}
+      newGame={props.newGame}
     />
     <GithubDialog open={props.github} onClose={() => props.openGithub(false)} />
     <LoadDialog

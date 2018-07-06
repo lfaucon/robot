@@ -1,23 +1,23 @@
 import * as React from "react";
 
-const Line = ({ x, y }) => (
+const Line = ({ x, y, size }) => (
   <line
     x1={x !== undefined ? 50 * x : 0}
-    x2={x !== undefined ? 50 * x : 600}
+    x2={x !== undefined ? 50 * x : 50 * size}
     y1={y !== undefined ? 50 * y : 0}
-    y2={y !== undefined ? 50 * y : 600}
+    y2={y !== undefined ? 50 * y : 50 * size}
     style={{ stroke: "#333", strokeWidth: "1px" }}
   />
 );
 
-const Grid = ({ fill, x, y, selected }) => (
+const Grid = ({ size }) => (
   <g>
-    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(x => (
-      <Line key={"xline" + x} x={x} />
-    ))}
-    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(y => (
-      <Line key={"yline" + y} y={y} />
-    ))}
+    {new Array(size)
+      .fill()
+      .map((_, x) => <Line key={"xline" + x} x={x + 1} size={size} />)}
+    {new Array(size)
+      .fill()
+      .map((_, y) => <Line key={"yline" + y} y={y + 1} size={size} />)}
   </g>
 );
 

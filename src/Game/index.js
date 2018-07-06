@@ -19,7 +19,8 @@ class Game extends React.Component {
     moves: 0,
     config: {
       robots: 4,
-      blocks: 12
+      blocks: 12,
+      size: 12
     },
     robots: [],
     blocks: [],
@@ -34,8 +35,9 @@ class Game extends React.Component {
 
   getFreeCoordinates = () => {
     while (true) {
-      const _x = Math.floor(12 * this.rng());
-      const _y = Math.floor(12 * this.rng());
+      const { size } = this.state.config;
+      const _x = Math.floor(size * this.rng());
+      const _y = Math.floor(size * this.rng());
       const { robots, blocks, target } = this.state;
       const blockers = [...robots, ...blocks, target];
       if (!blockers.find(({ x, y }) => x === _x && y === _y)) {
@@ -53,9 +55,18 @@ class Game extends React.Component {
     });
   };
 
+  shuffleBlocks = () => {
+    const { config } = this.state;
+    new Array(config.blocks).fill().forEach((_, i) => {
+      const [x, y] = this.getFreeCoordinates();
+      this.state.robots.push({ x, y });
+    });
+  };
+
   shuffleTarget = () => {
+    const { config } = this.state;
     const [x, y] = this.getFreeCoordinates();
-    const stroke = colors[Math.floor(4 * this.rng())];
+    const stroke = colors[Math.floor(config.robots * this.rng())];
     this.state.target = { x, y, stroke };
     this.state.selected = stroke;
   };
@@ -86,11 +97,13 @@ class Game extends React.Component {
     this.state.moves += 1;
 
     const { robots, selected, blocks, target } = this.state;
+    const { size } = this.state.config;
+
     const R = robots.find(r => r.fill === selected);
     const blockers = [...robots, ...blocks];
 
     const maxFn = b => Math.max(-1, ...b) + 1;
-    const minFn = b => Math.min(12, ...b) - 1;
+    const minFn = b => Math.min(size, ...b) - 1;
     const [filterFn, xy, minmaxFn] = {
       up: [({ x, y }) => x === R.x && y < R.y, "y", maxFn],
       down: [({ x, y }) => x === R.x && y > R.y, "y", minFn],
@@ -105,7 +118,7 @@ class Game extends React.Component {
     this.forceUpdate();
   };
 
-  componentDidMount() {
+  componentWillMount() {
     this.newGame();
 
     Mousetrap.bind("right", () => this.move("right"));
@@ -117,6 +130,9 @@ class Game extends React.Component {
     Mousetrap.bind("g", () => this.setState({ selected: "green" }));
     Mousetrap.bind("b", () => this.setState({ selected: "blue" }));
     Mousetrap.bind("y", () => this.setState({ selected: "orange" }));
+
+    Mousetrap.bind("n", () => this.newGame());
+    Mousetrap.bind("q", () => this.restartGame());
   }
 
   componentWillUnmount() {
@@ -124,21 +140,24 @@ class Game extends React.Component {
   }
 
   render() {
-    const { winning, moves } = this.state;
+    const { winning, moves, config } = this.state;
     const controls = {
       restartGame: this.restartGame,
       newGame: this.newGame,
       selectRobot: color => this.setState({ selected: color }),
-      move: this.move
+      move: this.move,
+      setConfig: c => {
+        this.state.config = c;
+      }
     };
     return (
       <Grid container spacing={8}>
         <Grid item xs={12} sm={4} md={3}>
-          <SidePanel {...controls} />
+          <SidePanel {...controls} config={config} />
         </Grid>
         <Grid item xs={12} sm={7} md={6}>
           <Info {...this.state} />
-          <Board {...this.state} {...controls} />
+          <Board {...this.state} {...controls} size={config.size} />
         </Grid>
         <WinDialog
           open={winning}

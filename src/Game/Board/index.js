@@ -40,20 +40,25 @@ class Board extends React.Component {
 
   render() {
     const { robots, blocks, target, selected } = this.props;
-    const { move, selectRobot } = this.props;
+    const { move, selectRobot, size } = this.props;
+    const s = size * 50;
     return (
       <React.Fragment>
-        <svg viewBox="0 0 600 600" width="100%" ref={el => (this.board = el)}>
-          <rect width="600" height="600" style={style} />
+        <svg
+          viewBox={"0 0 " + s + " " + s}
+          width="100%"
+          ref={el => (this.board = el)}
+        >
+          <rect width={s} height={s} style={style} />
           {robots.map(R => (
             <Robot
+              key={JSON.stringify(R)}
               {...R}
               selected={selected === R.fill}
-              key={R.fill}
               selectRobot={() => selectRobot(R.fill)}
             />
           ))}
-          <SquareGrid />
+          <SquareGrid size={size} />
           <Blocks blocks={blocks} />
           <Target {...target} />
         </svg>
