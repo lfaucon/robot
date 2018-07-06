@@ -18,14 +18,14 @@ class Game extends React.Component {
     gameId: null,
     moves: 0,
     config: {
-      robots: 4,
-      blocks: 12,
-      size: 12
+      robots: 3,
+      blocks: 0,
+      size: 7
     },
     robots: [],
     blocks: [],
-    selected: "red",
     target: {},
+    selected: "red",
     winning: false
   };
 
@@ -156,8 +156,8 @@ class Game extends React.Component {
           <SidePanel {...controls} config={config} />
         </Grid>
         <Grid item xs={12} sm={7} md={6}>
-          <Info {...this.state} />
           <Board {...this.state} {...controls} size={config.size} />
+          <Info {...this.state} />
         </Grid>
         <WinDialog
           open={winning}

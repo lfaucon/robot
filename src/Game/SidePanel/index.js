@@ -76,6 +76,9 @@ const MobilePanel = props => (
     <IconButton onClick={() => props.openLoad(true)}>
       <Code />
     </IconButton>
+    <IconButton onClick={() => props.openSettings(true)}>
+      <Settings />
+    </IconButton>
   </Paper>
 );
 
