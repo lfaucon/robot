@@ -2,9 +2,6 @@ import * as React from "react";
 
 import Paper from "@material-ui/core/Paper";
 
-import GridOn from "@material-ui/icons/GridOn";
-import Grade from "@material-ui/icons/Grade";
-
 const style = {
   float: "right"
 };

@@ -8,6 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import Board from "./Board";
 import SidePanel from "./SidePanel";
 import Info from "./Info";
+import Sequence from "./Sequence";
 import WinDialog from "./WinDialog";
 
 const colors = ["red", "blue", "green", "orange"];
@@ -17,10 +18,11 @@ class Game extends React.Component {
   state = {
     gameId: null,
     moves: 0,
+    sequence: [],
     config: {
-      robots: 3,
-      blocks: 0,
-      size: 7
+      robots: 4,
+      blocks: 4,
+      size: 8
     },
     robots: [],
     blocks: [],
@@ -83,6 +85,7 @@ class Game extends React.Component {
     this.shuffleTarget();
     this.state.winning = false;
     this.state.moves = 0;
+    this.state.sequence = [];
     this.state.gameId = gameId;
     this.forceUpdate();
     this.saveState();
@@ -90,12 +93,12 @@ class Game extends React.Component {
 
   restartGame = () => {
     this.setState(cloneDeep(this.saved));
-    this.setState({ winning: false, moves: 0 });
+    this.setState({ winning: false, moves: 0, sequence: [] });
   };
 
   move = direction => {
     this.state.moves += 1;
-
+    this.state.sequence.push({ direction, color: this.state.selected });
     const { robots, selected, blocks, target } = this.state;
     const { size } = this.state.config;
 
@@ -158,6 +161,7 @@ class Game extends React.Component {
         <Grid item xs={12} sm={7} md={6}>
           <Board {...this.state} {...controls} size={config.size} />
           <Info {...this.state} />
+          <Sequence {...this.state} />
         </Grid>
         <WinDialog
           open={winning}
