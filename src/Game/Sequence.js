@@ -10,7 +10,7 @@ const D = {
 };
 
 const Sequence = ({ sequence }) => (
-  <Paper>
+  <Paper style={{ overflow: "hidden" }}>
     {sequence.map(x => (
       <span style={{ color: x.color }}>{D[x.direction]}</span>
     ))}
