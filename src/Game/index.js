@@ -11,6 +11,22 @@ import Info from "./Info";
 import Sequence from "./Sequence";
 import WinDialog from "./WinDialog";
 
+function download(filename, text) {
+  var element = document.createElement("a");
+  element.setAttribute(
+    "href",
+    "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+  );
+  element.setAttribute("download", filename);
+
+  element.style.display = "none";
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
 const colors = ["red", "blue", "green", "orange"];
 class Game extends React.Component {
   rng = seedrandom();
@@ -61,7 +77,7 @@ class Game extends React.Component {
     const { config } = this.state;
     new Array(config.blocks).fill().forEach((_, i) => {
       const [x, y] = this.getFreeCoordinates();
-      this.state.robots.push({ x, y });
+      this.state.blocks.push({ x, y });
     });
   };
 
@@ -121,6 +137,17 @@ class Game extends React.Component {
     this.forceUpdate();
   };
 
+  toString() {
+    const { target, robots, blocks, gameId, config } = this.state;
+    return [
+      gameId,
+      [config.size, config.robots, config.blocks].join(" "),
+      [colors.indexOf(target.stroke), target.x, target.y].join(" "),
+      ...robots.map(r => r.x + " " + r.y),
+      ...blocks.map(b => b.x + " " + b.y)
+    ].join("\n");
+  }
+
   componentWillMount() {
     this.newGame();
 
@@ -136,6 +163,11 @@ class Game extends React.Component {
 
     Mousetrap.bind("n", () => this.newGame());
     Mousetrap.bind("q", () => this.restartGame());
+
+    Mousetrap.bind("shift+d", () => {
+      console.log("download");
+      download(this.state.gameId + ".robot", this.toString());
+    });
   }
 
   componentWillUnmount() {
