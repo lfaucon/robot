@@ -62,7 +62,7 @@ const SettingsDialog = ({
     <DialogActions>
       <Button
         onClick={() => {
-          const s = Math.max(4, Math.min(24, size));
+          const s = Math.max(4, Math.min(256, size));
           const r = Math.max(1, Math.min(4, robots));
           const b = Math.max(0, Math.min(Math.floor((s * s) / 3), blocks));
           setSize(s);
