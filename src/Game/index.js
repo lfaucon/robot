@@ -2,11 +2,11 @@ import * as React from "react";
 import Mousetrap from "mousetrap";
 import { cloneDeep } from "lodash";
 import seedrandom from "seedrandom";
+import firebase from "firebase";
 
 import Grid from "@material-ui/core/Grid";
 
 import Board from "../Board";
-import SidePanel from "../SidePanel";
 import Info from "./Info";
 import Sequence from "./Sequence";
 import WinDialog from "./WinDialog";
@@ -101,11 +101,29 @@ class Game extends React.Component {
     this.state.gameId = gameId;
     this.forceUpdate();
     this.saveState();
+
+    const userName = localStorage.getItem("login");
+    const database = firebase.database();
+    const eventRef = database.ref("users/" + userName).push();
+    eventRef.set({
+      event: "START",
+      date: Date.now(),
+      gameId: this.fullId()
+    });
   };
 
   restartGame = () => {
     this.setState(cloneDeep(this.saved));
     this.setState({ winning: false, moves: 0, sequence: [] });
+
+    const userName = localStorage.getItem("login");
+    const database = firebase.database();
+    const eventRef = database.ref("users/" + userName).push();
+    eventRef.set({
+      event: "RESTART",
+      date: Date.now(),
+      gameId: this.fullId()
+    });
   };
 
   move = direction => {
@@ -129,6 +147,18 @@ class Game extends React.Component {
 
     if (R.fill === target.stroke && R.x === target.x && R.y === target.y) {
       this.state.winning = true;
+      const database = firebase.database();
+      const sequenceRef = database.ref("games/" + this.fullId()).push();
+      sequenceRef.set(this.state.sequence);
+
+      const userName = localStorage.getItem("login");
+      const eventRef = database.ref("users/" + userName).push();
+      eventRef.set({
+        event: "WIN",
+        date: Date.now(),
+        gameId: this.fullId(),
+        sequence: this.state.sequence
+      });
     }
     this.forceUpdate();
   };
@@ -142,6 +172,12 @@ class Game extends React.Component {
       ...robots.map(r => r.x + " " + r.y),
       ...blocks.map(b => b.x + " " + b.y)
     ].join("\n");
+  }
+
+  fullId() {
+    const { size, robots, blocks } = this.state.config;
+    const conf = [size, robots, blocks].join("|");
+    return conf + "/" + this.state.gameId;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -173,8 +209,15 @@ class Game extends React.Component {
     Mousetrap.bind("b", () => this.setState({ selected: "blue" }));
     Mousetrap.bind("y", () => this.setState({ selected: "orange" }));
 
-    Mousetrap.bind("n", () => this.newGame());
-    Mousetrap.bind("q", () => this.restartGame());
+    const newGame = () =>
+      this.props.history.push(
+        Math.floor(Math.random() * 0x1000000).toString(16)
+      );
+
+    const restartGame = () => this.props.history.push();
+
+    Mousetrap.bind("n", newGame);
+    Mousetrap.bind("t", restartGame);
 
     Mousetrap.bind("shift+d", () => {
       console.log("download");
@@ -200,22 +243,17 @@ class Game extends React.Component {
       }
     };
     return (
-      <Grid container spacing={8}>
-        <Grid item xs={12} sm={4} md={3}>
-          <SidePanel {...controls} config={config} />
-        </Grid>
-        <Grid item xs={12} sm={7} md={6}>
-          <Board {...this.state} {...controls} size={config.size} />
-          <Info {...this.state} />
-          <Sequence {...this.state} />
-        </Grid>
+      <React.Fragment>
+        <Board {...this.state} {...controls} size={config.size} />
+        <Info {...this.state} />
+        <Sequence {...this.state} />
         <WinDialog
           open={winning}
           moves={moves}
           onClose={() => this.setState({ winning: false })}
           history={this.props.history}
         />
-      </Grid>
+      </React.Fragment>
     );
   }
 }

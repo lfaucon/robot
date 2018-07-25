@@ -68,7 +68,9 @@ const SettingsDialog = ({
           setRobots(r);
           setBlocks(b);
           const gameId = Math.floor(Math.random() * 0x1000000).toString(16);
-          history.push(["", "puzzle", size, robots, blocks, gameId].join("/"));
+          history.push(
+            ["", "robot", "puzzle", size, robots, blocks, gameId].join("/")
+          );
           onClose();
         }}
         color="primary"
