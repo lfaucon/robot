@@ -12,14 +12,13 @@ import TextField from "@material-ui/core/TextField";
 const SettingsDialog = ({
   open,
   onClose,
-  setConfig,
+  history,
   blocks,
   size,
   robots,
   setBlocks,
   setSize,
-  setRobots,
-  newGame
+  setRobots
 }) => (
   <Dialog
     open={open}
@@ -68,8 +67,8 @@ const SettingsDialog = ({
           setSize(s);
           setRobots(r);
           setBlocks(b);
-          setConfig({ size: s, robots: r, blocks: b });
-          newGame();
+          const gameId = Math.floor(Math.random() * 0x1000000).toString(16);
+          history.push(["", "puzzle", size, robots, blocks, gameId].join("/"));
           onClose();
         }}
         color="primary"

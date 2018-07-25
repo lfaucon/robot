@@ -1,9 +1,11 @@
 import * as React from "react";
-import Game from "./Game";
+import { Switch, Route } from "react-router-dom";
 
 import { withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Typography from "@material-ui/core/Typography";
+
+import Game from "./Game";
 
 const styles = () => ({
   root: {
@@ -21,6 +23,8 @@ const styles = () => ({
   }
 });
 
+const Home = () => "hello world";
+
 class App extends React.Component {
   render() {
     const { classes } = this.props;
@@ -32,7 +36,13 @@ class App extends React.Component {
           </Typography>
         </AppBar>
         <div className={classes.content}>
-          <Game />
+          <Switch>
+            <Route exact path="/" component={Home} />
+            <Route
+              path="/puzzle/:size/:robots/:blocks/:seed"
+              component={Game}
+            />
+          </Switch>
         </div>
       </div>
     );

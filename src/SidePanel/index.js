@@ -1,5 +1,6 @@
 import * as React from "react";
 import { compose, withState } from "recompose";
+import { withRouter } from "react-router-dom";
 
 import Hidden from "@material-ui/core/Hidden";
 import IconButton from "@material-ui/core/IconButton";
@@ -14,7 +15,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Menu from "@material-ui/icons/Menu";
 import Assignment from "@material-ui/icons/Assignment";
 import Replay from "@material-ui/icons/Replay";
-import Code from "@material-ui/icons/Code";
+import Share from "@material-ui/icons/Share";
 import Settings from "@material-ui/icons/Settings";
 import BugReport from "@material-ui/icons/BugReport";
 import Build from "@material-ui/icons/Build";
@@ -23,7 +24,6 @@ import Casino from "@material-ui/icons/Casino";
 import RulesDialog from "./RulesDialog";
 import SettingsDialog from "./SettingsDialog";
 import GithubDialog from "./GithubDialog";
-import LoadDialog from "./LoadDialog";
 
 const LI = ({ Icon, text, onClick }) => (
   <ListItem button onClick={onClick}>
@@ -34,25 +34,53 @@ const LI = ({ Icon, text, onClick }) => (
   </ListItem>
 );
 
+const copyToClipboard = str => {
+  const el = document.createElement("textarea");
+  el.value = str;
+  el.setAttribute("readonly", "");
+  el.style.position = "absolute";
+  el.style.left = "-9999px";
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand("copy");
+  document.body.removeChild(el);
+};
+
+const newGame = history => {
+  history.push(Math.floor(Math.random() * 0x1000000).toString(16));
+};
+
+const restartGame = history => {
+  history.push();
+};
+
+const share = () => {
+  window.alert("Share the URL: " + window.location.href);
+};
+
 const SidePanel = ({
   openRules,
   openSettings,
   openGithub,
   openLoad,
-  newGame,
-  restartGame
+  history
 }) => (
   <List component="div">
     <LI Icon={Assignment} text="How to play" onClick={() => openRules(true)} />
     <Divider />
-    <LI Icon={Replay} text="Restart Puzzle" onClick={() => restartGame()} />
-    <LI Icon={Casino} text="New Puzzle" onClick={() => newGame()} />
-    <LI Icon={Code} text="Load Game" onClick={() => openLoad(true)} />
+    <LI
+      Icon={Replay}
+      text="Restart Puzzle"
+      onClick={() => restartGame(history)}
+    />
+    <LI Icon={Casino} text="New Puzzle" onClick={() => newGame(history)} />
     <LI
       Icon={Settings}
       text="Game settings"
       onClick={() => openSettings(true)}
     />
+    <Divider />
+    <LI Icon={Share} text="Share puzzle" onClick={share} />
     <Divider />
     <LI Icon={BugReport} text="Report a bug" onClick={() => openGithub(true)} />
     <LI Icon={Build} text="Contribute" onClick={() => openGithub(true)} />
@@ -73,8 +101,8 @@ const MobilePanel = props => (
     <IconButton onClick={() => props.newGame()}>
       <Casino />
     </IconButton>
-    <IconButton onClick={() => props.openLoad(true)}>
-      <Code />
+    <IconButton onClick={() => window.alert("copy to clipboard")}>
+      <Share />
     </IconButton>
     <IconButton onClick={() => props.openSettings(true)}>
       <Settings />
@@ -102,16 +130,10 @@ const Dialogs = props => (
     <SettingsDialog
       open={props.settings}
       config={props.config}
-      setConfig={props.setConfig}
       onClose={() => props.openSettings(false)}
-      newGame={props.newGame}
+      history={props.history}
     />
     <GithubDialog open={props.github} onClose={() => props.openGithub(false)} />
-    <LoadDialog
-      open={props.load}
-      onClose={() => props.openLoad(false)}
-      newGame={props.newGame}
-    />
   </React.Fragment>
 );
 
@@ -119,7 +141,7 @@ export default compose(
   withState("rules", "openRules", false),
   withState("settings", "openSettings", false),
   withState("github", "openGithub", false),
-  withState("load", "openLoad", false)
+  withRouter
 )(props => (
   <React.Fragment>
     <ReactiveSidePanel {...props} />

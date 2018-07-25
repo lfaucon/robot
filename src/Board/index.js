@@ -40,7 +40,7 @@ class Board extends React.Component {
 
   render() {
     const { robots, blocks, target, selected } = this.props;
-    const { move, selectRobot, size } = this.props;
+    const { selectRobot, size } = this.props;
     const s = size * 50;
     return (
       <React.Fragment>

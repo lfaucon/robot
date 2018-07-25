@@ -5,8 +5,8 @@ import seedrandom from "seedrandom";
 
 import Grid from "@material-ui/core/Grid";
 
-import Board from "./Board";
-import SidePanel from "./SidePanel";
+import Board from "../Board";
+import SidePanel from "../SidePanel";
 import Info from "./Info";
 import Sequence from "./Sequence";
 import WinDialog from "./WinDialog";
@@ -35,11 +35,7 @@ class Game extends React.Component {
     gameId: null,
     moves: 0,
     sequence: [],
-    config: {
-      robots: 4,
-      blocks: 4,
-      size: 8
-    },
+    config: {},
     robots: [],
     blocks: [],
     target: {},
@@ -148,8 +144,24 @@ class Game extends React.Component {
     ].join("\n");
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { size, robots, blocks, seed } = nextProps.match.params;
+    this.state.config = {
+      size: parseInt(size),
+      robots: parseInt(robots),
+      blocks: parseInt(blocks)
+    };
+    this.newGame(seed);
+  }
+
   componentWillMount() {
-    this.newGame();
+    const { size, robots, blocks, seed } = this.props.match.params;
+    this.state.config = {
+      size: parseInt(size),
+      robots: parseInt(robots),
+      blocks: parseInt(blocks)
+    };
+    this.newGame(seed);
 
     Mousetrap.bind("right", () => this.move("right"));
     Mousetrap.bind("left", () => this.move("left"));
@@ -175,6 +187,8 @@ class Game extends React.Component {
   }
 
   render() {
+    console.log(this.props.match.params);
+
     const { winning, moves, config } = this.state;
     const controls = {
       restartGame: this.restartGame,
@@ -199,7 +213,7 @@ class Game extends React.Component {
           open={winning}
           moves={moves}
           onClose={() => this.setState({ winning: false })}
-          {...controls}
+          history={this.props.history}
         />
       </Grid>
     );

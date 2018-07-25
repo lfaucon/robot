@@ -7,7 +7,15 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
-const WinDialog = ({ open, onClose, moves, newGame, restartGame }) => (
+const newGame = history => {
+  history.push(Math.floor(Math.random() * 0x1000000).toString(16));
+};
+
+const restartGame = history => {
+  history.push();
+};
+
+const WinDialog = ({ open, onClose, moves, history }) => (
   <Dialog
     open={open}
     onClose={onClose}
@@ -22,10 +30,10 @@ const WinDialog = ({ open, onClose, moves, newGame, restartGame }) => (
       </DialogContentText>
     </DialogContent>
     <DialogActions>
-      <Button onClick={() => restartGame()} color="primary">
+      <Button onClick={() => restartGame(history)} color="primary">
         Try Again
       </Button>
-      <Button onClick={() => newGame()} color="primary">
+      <Button onClick={() => newGame(history)} color="primary">
         New Puzzle
       </Button>
     </DialogActions>
