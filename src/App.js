@@ -59,7 +59,9 @@ class App extends React.Component {
             </Grid>
             <Grid item xs={12} sm={7} md={6}>
               <Switch>
+                <Route exact path="/" component={Home} />
                 <Route exact path="/robot/" component={Home} />
+                <Route exact path="/robot/index.html" component={Home} />
                 <Route
                   path="/robot/puzzle/:size/:robots/:blocks/:seed"
                   component={Game}

@@ -55,7 +55,8 @@ const restartGame = history => {
 };
 
 const share = () => {
-  window.alert("Share the URL: " + window.location.href);
+  copyToClipboard(window.location.href);
+  window.alert("URL copied to clipboard");
 };
 
 const SidePanel = ({
@@ -95,13 +96,13 @@ const MobilePanel = props => (
     <IconButton onClick={() => props.openRules(true)}>
       <Assignment />
     </IconButton>
-    <IconButton onClick={() => props.restartGame()}>
+    <IconButton onClick={() => restartGame(props.history)}>
       <Replay />
     </IconButton>
-    <IconButton onClick={() => props.newGame()}>
+    <IconButton onClick={() => newGame(props.history)}>
       <Casino />
     </IconButton>
-    <IconButton onClick={() => window.alert("copy to clipboard")}>
+    <IconButton onClick={share}>
       <Share />
     </IconButton>
     <IconButton onClick={() => props.openSettings(true)}>

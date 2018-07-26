@@ -29,10 +29,12 @@ const SettingsDialog = ({ open, setName, name, loggedIn }) => (
     <DialogActions>
       <Button
         onClick={() => {
-          console.log("hi");
-          console.log("hi");
-          window.localStorage.setItem("login", name);
-          loggedIn();
+          if (name.length > 2) {
+            window.localStorage.setItem("login", name);
+            loggedIn();
+          } else {
+            alert("Your name should be at least three letters");
+          }
         }}
         color="primary"
       >
