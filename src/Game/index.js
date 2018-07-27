@@ -1,11 +1,10 @@
 import * as React from "react";
 import Mousetrap from "mousetrap";
-import { cloneDeep } from "lodash";
-import seedrandom from "seedrandom";
 import firebase from "firebase";
 
 import Grid from "@material-ui/core/Grid";
 
+import GameAPI from "./api";
 import Board from "../Board";
 import Info from "./Info";
 import Sequence from "./Sequence";
@@ -27,80 +26,11 @@ function download(filename, text) {
   document.body.removeChild(element);
 }
 
-const colors = ["red", "blue", "green", "orange"];
 class Game extends React.Component {
-  rng = seedrandom();
-
-  state = {
-    gameId: null,
-    moves: 0,
-    sequence: [],
-    config: {},
-    robots: [],
-    blocks: [],
-    target: {},
-    selected: "red",
-    winning: false
-  };
-
-  saveState = () => {
-    this.saved = cloneDeep(this.state);
-  };
-
-  getFreeCoordinates = () => {
-    while (true) {
-      const { size } = this.state.config;
-      const _x = Math.floor(size * this.rng());
-      const _y = Math.floor(size * this.rng());
-      const { robots, blocks, target } = this.state;
-      const blockers = [...robots, ...blocks, target];
-      if (!blockers.find(({ x, y }) => x === _x && y === _y)) {
-        return [_x, _y];
-      }
-    }
-  };
-
-  shuffleRobots = () => {
-    const { config } = this.state;
-    new Array(config.robots).fill().forEach((_, i) => {
-      const [x, y] = this.getFreeCoordinates();
-      const fill = colors[i];
-      this.state.robots.push({ x, y, fill });
-    });
-  };
-
-  shuffleBlocks = () => {
-    const { config } = this.state;
-    new Array(config.blocks).fill().forEach((_, i) => {
-      const [x, y] = this.getFreeCoordinates();
-      this.state.blocks.push({ x, y });
-    });
-  };
-
-  shuffleTarget = () => {
-    const { config } = this.state;
-    const [x, y] = this.getFreeCoordinates();
-    const stroke = colors[Math.floor(config.robots * this.rng())];
-    this.state.target = { x, y, stroke };
-    this.state.selected = stroke;
-  };
+  game = null;
 
   newGame = seed => {
-    const randSeed = Math.floor(Math.random() * 0x1000000).toString(16);
-    const gameId = seed ? seed : randSeed;
-    this.rng = seedrandom(gameId);
-    this.state.robots = [];
-    this.state.blocks = [];
-    this.state.target = { x: -1, y: -1 };
-    this.shuffleBlocks();
-    this.shuffleRobots();
-    this.shuffleTarget();
-    this.state.winning = false;
-    this.state.moves = 0;
-    this.state.sequence = [];
-    this.state.gameId = gameId;
-    this.forceUpdate();
-    this.saveState();
+    this.game = new GameAPI({}, "hello");
 
     const userName = localStorage.getItem("login");
     const database = firebase.database();
@@ -113,8 +43,7 @@ class Game extends React.Component {
   };
 
   restartGame = () => {
-    this.setState(cloneDeep(this.saved));
-    this.setState({ winning: false, moves: 0, sequence: [] });
+    this.game.loadInitialState();
 
     const userName = localStorage.getItem("login");
     const database = firebase.database();
@@ -127,29 +56,13 @@ class Game extends React.Component {
   };
 
   move = direction => {
-    this.state.moves += 1;
-    this.state.sequence.push({ direction, color: this.state.selected });
-    const { robots, selected, blocks, target } = this.state;
-    const { size } = this.state.config;
+    this.game.move(direction);
+    this.forceUpdate();
 
-    const R = robots.find(r => r.fill === selected);
-    const blockers = [...robots, ...blocks];
-
-    const maxFn = b => Math.max(-1, ...b) + 1;
-    const minFn = b => Math.min(size, ...b) - 1;
-    const [filterFn, xy, minmaxFn] = {
-      up: [({ x, y }) => x === R.x && y < R.y, "y", maxFn],
-      down: [({ x, y }) => x === R.x && y > R.y, "y", minFn],
-      left: [({ x, y }) => x < R.x && y === R.y, "x", maxFn],
-      right: [({ x, y }) => x > R.x && y === R.y, "x", minFn]
-    }[direction];
-    R[xy] = minmaxFn(blockers.filter(filterFn).map(i => i[xy]));
-
-    if (R.fill === target.stroke && R.x === target.x && R.y === target.y) {
-      this.state.winning = true;
+    if (this.game.winning) {
       const database = firebase.database();
       const sequenceRef = database.ref("games/" + this.fullId()).push();
-      sequenceRef.set(this.state.sequence);
+      sequenceRef.set(this.game.sequence);
 
       const userName = localStorage.getItem("login");
       const eventRef = database.ref("users/" + userName).push();
@@ -157,57 +70,50 @@ class Game extends React.Component {
         event: "WIN",
         date: Date.now(),
         gameId: this.fullId(),
-        sequence: this.state.sequence
+        sequence: this.game.sequence
       });
     }
+  };
+
+  selectRobot = color => {
+    this.game.selectRobot(color);
     this.forceUpdate();
   };
 
-  toString() {
-    const { target, robots, blocks, gameId, config } = this.state;
-    return [
-      gameId,
-      [config.size, config.robots, config.blocks].join(" "),
-      [colors.indexOf(target.stroke), target.x, target.y].join(" "),
-      ...robots.map(r => r.x + " " + r.y),
-      ...blocks.map(b => b.x + " " + b.y)
-    ].join("\n");
-  }
-
   fullId() {
-    const { size, robots, blocks } = this.state.config;
+    const { size, robots, blocks } = this.game.config;
     const conf = [size, robots, blocks].join("|");
-    return conf + "/" + this.state.gameId;
+    return conf + "/" + this.game.gameId;
   }
 
   componentWillReceiveProps(nextProps) {
     const { size, robots, blocks, seed } = nextProps.match.params;
-    this.state.config = {
+    const config = {
       size: parseInt(size),
       robots: parseInt(robots),
       blocks: parseInt(blocks)
     };
-    this.newGame(seed);
+    this.game = new GameAPI(config, seed);
   }
 
   componentWillMount() {
     const { size, robots, blocks, seed } = this.props.match.params;
-    this.state.config = {
+    const config = {
       size: parseInt(size),
       robots: parseInt(robots),
       blocks: parseInt(blocks)
     };
-    this.newGame(seed);
+    this.game = new GameAPI(config, seed);
 
     Mousetrap.bind("right", () => this.move("right"));
     Mousetrap.bind("left", () => this.move("left"));
     Mousetrap.bind("down", () => this.move("down"));
     Mousetrap.bind("up", () => this.move("up"));
 
-    Mousetrap.bind("r", () => this.setState({ selected: "red" }));
-    Mousetrap.bind("g", () => this.setState({ selected: "green" }));
-    Mousetrap.bind("b", () => this.setState({ selected: "blue" }));
-    Mousetrap.bind("y", () => this.setState({ selected: "orange" }));
+    Mousetrap.bind("r", () => this.selectRobot("red"));
+    Mousetrap.bind("g", () => this.selectRobot("green"));
+    Mousetrap.bind("b", () => this.selectRobot("blue"));
+    Mousetrap.bind("y", () => this.selectRobot("orange"));
 
     const newGame = () =>
       this.props.history.push(
@@ -220,8 +126,7 @@ class Game extends React.Component {
     Mousetrap.bind("t", restartGame);
 
     Mousetrap.bind("shift+d", () => {
-      console.log("download");
-      download(this.state.gameId + ".robot", this.toString());
+      download(this.game.gameId + ".robot", this.game.toString());
     });
   }
 
@@ -230,26 +135,14 @@ class Game extends React.Component {
   }
 
   render() {
-    console.log(this.props.match.params);
-
-    const { winning, moves, config } = this.state;
-    const controls = {
-      restartGame: this.restartGame,
-      newGame: this.newGame,
-      selectRobot: color => this.setState({ selected: color }),
-      move: this.move,
-      setConfig: c => {
-        this.state.config = c;
-      }
-    };
     return (
       <React.Fragment>
-        <Board {...this.state} {...controls} size={config.size} />
-        <Info {...this.state} />
-        <Sequence {...this.state} />
+        <Board game={this.game} />
+        <Info gameId={this.game.gameId} moves={this.game.moves} />
+        <Sequence sequence={this.game.sequence} />
         <WinDialog
-          open={winning}
-          moves={moves}
+          open={this.game.winning}
+          moves={this.game.moves}
           onClose={() => this.setState({ winning: false })}
           history={this.props.history}
         />

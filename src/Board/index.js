@@ -16,32 +16,27 @@ const style = {
 class Board extends React.Component {
   board = null;
 
-  test = () => {
-    console.log("test");
-  };
-
   componentDidMount() {
-    const { move } = this.props;
+    const { game } = this.props;
     this.hammer = Hammer(this.board);
     this.hammer.get("swipe").set({ direction: Hammer.DIRECTION_ALL });
-    this.hammer.on("swipeleft", () => move("left"));
-    this.hammer.on("swiperight", () => move("right"));
-    this.hammer.on("swipeup", () => move("up"));
-    this.hammer.on("swipedown", () => move("down"));
+    this.hammer.on("swipeleft", () => game.move("left"));
+    this.hammer.on("swiperight", () => game.move("right"));
+    this.hammer.on("swipeup", () => game.move("up"));
+    this.hammer.on("swipedown", () => game.move("down"));
   }
 
   componentWillUnmount() {
-    const { move } = this.props;
-    this.hammer.off("swipeleft", () => move("left"));
-    this.hammer.off("swiperight", () => move("right"));
-    this.hammer.off("swipeup", () => move("up"));
-    this.hammer.off("swipedown", () => move("down"));
+    const { game } = this.props;
+    this.hammer.off("swipeleft", () => game.move("left"));
+    this.hammer.off("swiperight", () => game.move("right"));
+    this.hammer.off("swipeup", () => game.move("up"));
+    this.hammer.off("swipedown", () => game.move("down"));
   }
 
   render() {
-    const { robots, blocks, target, selected } = this.props;
-    const { selectRobot, size } = this.props;
-    const s = size * 50;
+    const { game } = this.props;
+    const s = game.config.size * 50;
     return (
       <React.Fragment>
         <svg
@@ -50,19 +45,19 @@ class Board extends React.Component {
           ref={el => (this.board = el)}
         >
           <rect width={s} height={s} style={style} />
-          {robots.map(R => (
+          {game.robots.map(R => (
             <Robot
               key={JSON.stringify(R)}
               {...R}
-              selected={selected === R.fill}
-              selectRobot={() => selectRobot(R.fill)}
+              selected={game.selected === R.fill}
+              selectRobot={() => game.selectRobot(R.fill)}
             />
           ))}
-          <SquareGrid size={size} />
-          <Blocks blocks={blocks} />
-          <Target {...target} />
+          <SquareGrid size={game.config.size} />
+          <Blocks blocks={game.blocks} />
+          <Target {...game.target} />
         </svg>
-        <Controls selectRobot={selectRobot} />
+        <Controls selectRobot={game.selectRobot} />
       </React.Fragment>
     );
   }

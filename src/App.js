@@ -9,6 +9,7 @@ import Grid from "@material-ui/core/Grid";
 import SidePanel from "./SidePanel";
 import LoginDialog from "./LoginDialog";
 import Game from "./Game";
+import Party from "./Party";
 
 const styles = () => ({
   root: {
@@ -66,6 +67,7 @@ class App extends React.Component {
                   path="/robot/puzzle/:size/:robots/:blocks/:seed"
                   component={Game}
                 />
+                <Route path="/robot/party/:id" component={Party} />
               </Switch>
             </Grid>
           </Grid>
