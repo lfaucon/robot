@@ -76,7 +76,7 @@ class Party extends React.Component {
               console.log("click");
               this.partyRef.set({
                 owner: username,
-                config: { size: 6, robots: 4, blocks: 3 },
+                config: { size: 9, robots: 4, blocks: 5 },
                 gameId: Math.floor(Math.random() * 0x1000000).toString(16)
               });
             }}
