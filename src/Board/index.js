@@ -17,29 +17,31 @@ class Board extends React.Component {
 
   componentWillUnmount() {}
 
+  selectRobot = color => {
+    this.props.game.selectRobot(color);
+    this.forceUpdate();
+  };
+
   render() {
     const { game } = this.props;
     const s = game.config.size * 50;
     return (
       <React.Fragment>
-        <svg viewBox={"0 0 " + s + " " + s} width="100%">
-          <rect width={s} height={s} style={style} ref={this.props._ref} />
+        <svg viewBox={"0 0 " + s + " " + s} width="100%" ref={this.props._ref}>
+          <rect width={s} height={s} style={style} />
           {game.robots.map(R => (
             <Robot
               key={JSON.stringify(R)}
               {...R}
               selected={game.selected === R.fill}
-              selectRobot={() => {
-                game.selectRobot(R.fill);
-                this.forceUpdate();
-              }}
+              selectRobot={() => this.selectRobot(R.fill)}
             />
           ))}
           <SquareGrid size={game.config.size} />
           <Blocks blocks={game.blocks} />
           <Target {...game.target} />
         </svg>
-        <Controls selectRobot={game.selectRobot} />
+        <Controls selectRobot={this.selectRobot} />
       </React.Fragment>
     );
   }
