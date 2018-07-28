@@ -23,6 +23,8 @@ export default class Game {
   };
 
   loadInitialState() {
+    this.rng = seedrandom(this.gameId);
+
     this.blocks = [];
     this.robots = [];
     this.target = { x: -1, y: -1 };

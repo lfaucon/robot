@@ -10,6 +10,7 @@ import SidePanel from "./SidePanel";
 import LoginDialog from "./LoginDialog";
 import Game from "./Game";
 import Party from "./Party";
+import Puzzle from "./Puzzle";
 
 const styles = () => ({
   root: {
@@ -41,7 +42,7 @@ class App extends React.Component {
 
   render() {
     const { classes } = this.props;
-
+    const username = localStorage.getItem("login");
     return (
       <div className={classes.root}>
         <LoginDialog
@@ -50,7 +51,7 @@ class App extends React.Component {
         />
         <AppBar className={classes.appbar}>
           <Typography variant="title" color="inherit" noWrap>
-            Welcome to Robot
+            {"Welcome to Robot" + (username ? ", " + username : "")}
           </Typography>
         </AppBar>
         <div className={classes.content}>
@@ -65,7 +66,7 @@ class App extends React.Component {
                 <Route exact path="/robot/index.html" component={Home} />
                 <Route
                   path="/robot/puzzle/:size/:robots/:blocks/:seed"
-                  component={Game}
+                  component={Puzzle}
                 />
                 <Route path="/robot/party/:id" component={Party} />
               </Switch>
