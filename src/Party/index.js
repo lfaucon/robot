@@ -101,13 +101,11 @@ class Party extends React.Component {
             this.partyRef
               .child("gameId/")
               .set(Math.floor(Math.random() * 0x1000000).toString(16));
+            this.partyRef.child("solutions/").set({});
           }}
         >
           Next Game
         </button>
-        <pre style={{ position: "fixed", top: 50, right: 0 }}>
-          {JSON.stringify(this.state, null, 2)}
-        </pre>
       </React.Fragment>
     );
   }

@@ -35,6 +35,7 @@ export default class Puzzle extends React.Component {
       gameId: this.fullId()
     });
     this.props.history.push(Math.floor(Math.random() * 0x1000000).toString(16));
+    this.setState({ winning: false });
   };
 
   restartGame = () => {
@@ -47,6 +48,7 @@ export default class Puzzle extends React.Component {
       gameId: this.fullId()
     });
     this.props.history.push();
+    this.setState({ winning: false });
   };
 
   onWin = () => {

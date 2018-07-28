@@ -1,4 +1,5 @@
 import * as React from "react";
+import Hammer from "hammerjs";
 import Mousetrap from "mousetrap";
 import firebase from "firebase";
 
@@ -10,6 +11,8 @@ import Info from "./Info";
 import Sequence from "./Sequence";
 
 class Game extends React.Component {
+  board = null;
+
   move = direction => {
     this.props.game.move(direction);
     this.forceUpdate();
@@ -42,14 +45,32 @@ class Game extends React.Component {
     Mousetrap.bind("y", () => this.selectRobot("orange"));
   }
 
+  componentDidMount() {
+    this.hammer = Hammer(this.board);
+    this.hammer.get("swipe").set({ direction: Hammer.DIRECTION_ALL });
+    this.hammer.on("swipeleft", () => this.move("left"));
+    this.hammer.on("swiperight", () => this.move("right"));
+    this.hammer.on("swipeup", () => this.move("up"));
+    this.hammer.on("swipedown", () => this.move("down"));
+  }
+
   componentWillUnmount() {
     Mousetrap.reset();
+
+    this.hammer.off("swipeleft", () => this.move("left"));
+    this.hammer.off("swiperight", () => this.move("right"));
+    this.hammer.off("swipeup", () => this.move("up"));
+    this.hammer.off("swipedown", () => this.move("down"));
   }
 
   render() {
     return (
       <React.Fragment>
-        <Board game={this.props.game} selectRobot={this.selectRobot} />
+        <Board
+          _ref={el => (this.board = el)}
+          game={this.props.game}
+          selectRobot={this.selectRobot}
+        />
         <Info gameId={this.props.game.gameId} moves={this.props.game.moves} />
         <Sequence sequence={this.props.game.sequence} />
       </React.Fragment>
