@@ -3,8 +3,8 @@ import Paper from "@material-ui/core/Paper";
 
 export default ({ solutions }) => (
   <Paper>
-    {Object.entries(solutions).map(([name, seq]) => (
-      <p key={name}>{name + ": " + seq.length}</p>
+    {Object.entries(solutions || {}).map(([name, solution]) => (
+      <p key={name}>{name + ": " + solution.sequence.length}</p>
     ))}
   </Paper>
 );

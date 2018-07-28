@@ -39,9 +39,20 @@ class Party extends React.Component {
   onWin = () => {
     console.log("WIN");
     this.setState({ winning: true });
-
+    const { solutions } = this.state.party;
     const username = localStorage.getItem("login");
-    this.partyRef.child("solutions/" + username).set(this.game.sequence);
+    const sequence = this.game.sequence;
+    if (
+      !solutions ||
+      !solutions[username] ||
+      solutions[username].score > sequence.length
+    ) {
+      this.partyRef.child("solutions/" + username).set({
+        score: sequence.length,
+        sequence,
+        time: Date.now()
+      });
+    }
   };
 
   restartGame = () => {
@@ -94,7 +105,9 @@ class Party extends React.Component {
         >
           Next Game
         </button>
-        <pre>{JSON.stringify(this.state, null, 2)}</pre>
+        <pre style={{ position: "fixed", top: 50, right: 0 }}>
+          {JSON.stringify(this.state, null, 2)}
+        </pre>
       </React.Fragment>
     );
   }
